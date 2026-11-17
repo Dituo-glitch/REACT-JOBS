@@ -1,18 +1,20 @@
+import { useState, useEffect } from 'react';
 import JobListing from './JobListing';
-import jobsData from '../jobs.json'; // Ajusta la ruta si tu jobs.json está en otra carpeta dentro de src
+import jobsData from '../jobs.json';
 
-const JobListings = () => {
-  // Tomamos solo los primeros 3 empleos del archivo JSON
-  const recentJobs = jobsData.jobs.slice(0, 3);
+const JobListings = ({ isHome = false }) => {
+  // Filtramos o limitamos los empleos si estamos en el Home (ej. solo los primeros 3)
+  const [jobs, setJobs] = useState(jobsData);
+  const jobListings = isHome ? jobs.slice(0, 3) : jobs;
 
   return (
     <section className="bg-blue-50 px-4 py-10">
       <div className="container-xl lg:container m-auto">
         <h2 className="text-3xl font-bold text-indigo-500 mb-6 text-center">
-          Browse Jobs
+          {isHome ? 'Recent Jobs' : 'Browse Jobs'}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {recentJobs.map((job) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {jobListings.map((job) => (
             <JobListing key={job.id} job={job} />
           ))}
         </div>
