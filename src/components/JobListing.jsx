@@ -1,33 +1,39 @@
 import { useState } from 'react';
 import { FaMapMarker } from 'react-icons/fa';
-import { Link } from 'react-router-dom'; // 1. Importamos Link
+import { Link } from 'react-router-dom';
+import { formatSalary, formatType } from '../utils/format';
+
+const MAX_LENGTH = 90;
 
 const JobListing = ({ job }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);
 
-  let description = job.description;
-
-  if (!showFullDescription) {
-    description = description.substring(0, 90) + '...';
-  }
+  const fullDescription = job.description ?? '';
+  const isLong = fullDescription.length > MAX_LENGTH;
+  const description =
+    showFullDescription || !isLong
+      ? fullDescription
+      : fullDescription.substring(0, MAX_LENGTH) + '...';
 
   return (
     <div className="bg-white rounded-xl shadow-md relative p-4">
       <div className="mb-4">
-        <div className="text-gray-600 my-2">{job.type}</div>
+        <div className="text-gray-600 my-2">{formatType(job.type)}</div>
         <h3 className="text-xl font-bold">{job.title}</h3>
       </div>
 
-      <div className="mb-5">{description}</div>
+      <div className="mb-5 whitespace-pre-line">{description}</div>
 
-      <button
-        onClick={() => setShowFullDescription((prevState) => !prevState)}
-        className="text-indigo-500 mb-5 hover:text-indigo-600"
-      >
-        {showFullDescription ? 'Less' : 'More'}
-      </button>
+      {isLong && (
+        <button
+          onClick={() => setShowFullDescription((prev) => !prev)}
+          className="text-indigo-500 mb-5 hover:text-indigo-600"
+        >
+          {showFullDescription ? 'Ver menos' : 'Ver más'}
+        </button>
+      )}
 
-      <h3 className="text-indigo-500 mb-2">{job.salary} / Year</h3>
+      <h3 className="text-indigo-500 mb-2">{formatSalary(job.salary)} / año</h3>
 
       <div className="border border-gray-100 mb-5"></div>
 
@@ -36,13 +42,12 @@ const JobListing = ({ job }) => {
           <FaMapMarker className="inline text-lg mb-1 mr-1" />
           {job.location}
         </div>
-        
-        {/* 2. Cambiamos <a> por <Link> y href por to */}
+
         <Link
           to={`/jobs/${job.id}`}
           className="h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm"
         >
-          Read More
+          Ver detalle
         </Link>
       </div>
     </div>

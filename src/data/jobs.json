@@ -27,6 +27,34 @@
         "contactEmail": "jobs@startupxyz.io",
         "contactPhone": "+34 600 111 222"
       }
+    },
+    {
+      "id": "3",
+      "title": "Desarrollador Frontend React",
+      "type": "full-time",
+      "salary": "50k-100k",
+      "location": "Bogotá, Colombia",
+      "description": "Buscamos un desarrollador frontend para construir interfaces con React, Vite y Tailwind CSS.\n\nRequisitos:\n- 2+ años con React\n- Git y trabajo en equipo",
+      "company": {
+        "name": "Tech Solutions",
+        "description": "Consultora de software con clientes en toda Latinoamérica.",
+        "contactEmail": "talento@techsolutions.co",
+        "contactPhone": "+57 300 123 4567"
+      }
+    },
+    {
+      "id": "4",
+      "title": "React Native Developer",
+      "type": "remote",
+      "salary": "50k-100k",
+      "location": "Remoto",
+      "description": "Únete a nuestro equipo remoto para desarrollar apps móviles con React Native y TypeScript.",
+      "company": {
+        "name": "AppFactory",
+        "description": "Estudio de apps móviles 100% remoto.",
+        "contactEmail": "jobs@appfactory.dev",
+        "contactPhone": "+1 555 010 2030"
+      }
     }
   ]
 }

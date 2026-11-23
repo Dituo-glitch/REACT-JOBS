@@ -1,37 +1,33 @@
 // src/App.jsx
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'; // <-- Añadido Navigate
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import MainLayout from './components/MainLayout';
-import JobsPage, { jobsLoader } from './pages/JobsPage';
-import JobPage, { jobLoader } from './pages/JobPage';
+import ErrorPage from './components/ErrorPage';
+import HomePage from './pages/HomePage';
+import JobsPage from './pages/JobsPage';
+import JobPage from './pages/JobPage';
 import AddJobPage from './pages/AddJobPage';
 import EditJobPage from './pages/EditJobPage';
+import NotFoundPage from './pages/NotFoundPage';
+import { jobsLoader, jobLoader } from './api/jobs';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <MainLayout />,
-    errorElement: <div className="p-4 text-red-500">Error cargando página</div>,
+    errorElement: <ErrorPage />,
     children: [
-      { index: true, element: <Navigate to="/jobs" replace /> }, 
-      { 
-        path: 'jobs', 
-        element: <JobsPage />, 
-        loader: jobsLoader 
-      },
-      // ⚠️ IMPORTANTE: Las rutas estáticas van ANTES que las dinámicas (:id)
-      { 
-        path: 'jobs/add', 
-        element: <AddJobPage /> 
-      },
-      { 
-        path: 'jobs/edit/:id', 
-        element: <EditJobPage /> 
-      },
-      // La ruta dinámica va al final
-      { 
-        path: 'jobs/:id', 
-        element: <JobPage />, 
-        loader: jobLoader 
+      {
+        // Ruta sin path: los errores se muestran dentro del layout (con el menú)
+        errorElement: <ErrorPage />,
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: 'jobs', element: <JobsPage />, loader: jobsLoader },
+          // Las rutas estáticas van ANTES que las dinámicas (:id)
+          { path: 'jobs/add', element: <AddJobPage /> },
+          { path: 'jobs/edit/:id', element: <EditJobPage />, loader: jobLoader },
+          { path: 'jobs/:id', element: <JobPage />, loader: jobLoader },
+          { path: '*', element: <NotFoundPage /> },
+        ],
       },
     ],
   },

@@ -1,39 +1,45 @@
 import { useState, useEffect } from 'react';
 import JobListing from './JobListing';
 import Spinner from './Spinner';
+import { getJobs } from '../api/jobs';
 
 const JobListings = ({ isHome = false }) => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      // Si estamos en el home, limitamos la consulta a 3 con el parámetro de la API
-      const apiUrl = isHome ? '/api/jobs?_limit=3' : '/api/jobs';
+    let cancelled = false;
 
-      try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        setJobs(data);
-      } catch (error) {
-        console.log('Error fetching data', error);
-      } finally {
-        setLoading(false);
-      }
+    getJobs(isHome ? 3 : undefined)
+      .then((data) => {
+        if (!cancelled) setJobs(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
     };
-
-    fetchJobs();
   }, [isHome]);
 
   return (
-    <section className="bg-blue-50 px-4 py-10">
-      <div className="container-xl lg:container m-auto">
+    <section className="bg-blue-50 px-4 py-10 rounded-lg">
+      <div className="container m-auto">
         <h2 className="text-3xl font-bold text-indigo-500 mb-6 text-center">
-          {isHome ? 'Recent Jobs' : 'Browse Jobs'}
+          {isHome ? 'Empleos recientes' : 'Todos los empleos'}
         </h2>
 
         {loading ? (
           <Spinner loading={loading} />
+        ) : error ? (
+          <p className="text-center text-red-600">{error}</p>
+        ) : jobs.length === 0 ? (
+          <p className="text-center text-gray-500">No hay empleos publicados.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {jobs.map((job) => (
