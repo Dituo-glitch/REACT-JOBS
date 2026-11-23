@@ -1,57 +1,57 @@
+// src/pages/EditJobPage.jsx
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { API_BASE } from '../api/jobs';
 
-const EditJobPage = ({ updateJobSubmit }) => {
+const EditJobPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [title, setTitle] = useState('');
-  const [type, setType] = useState('Full-Time');
-  const [description, setDescription] = useState('');
-  const [salary, setSalary] = useState('Under $50K');
+  const [type, setType] = useState('full-time');
+  const [salary, setSalary] = useState('under-50k');
   const [location, setLocation] = useState('');
+  const [description, setDescription] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactPhone, setContactPhone] = useState('');
-  const [loading, setLoading] = useState(true);
 
-  // Cargar los datos actuales del empleo al montar el componente
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(`/api/jobs/${id}`);
-        const data = await res.json();
+        const response = await fetch(`${API_BASE}/${id}`);
+        if (!response.ok) throw new Error('No encontrado');
+        const job = await response.json();
 
-        setTitle(data.title);
-        setType(data.type);
-        setDescription(data.description);
-        setSalary(data.salary);
-        setLocation(data.location);
-        setCompanyName(data.company.name);
-        setCompanyDescription(data.company.description);
-        setContactEmail(data.company.contactEmail);
-        setContactPhone(data.company.contactPhone);
+        setTitle(job.title);
+        setType(job.type);
+        setSalary(job.salary);
+        setLocation(job.location);
+        setDescription(job.description);
+        setCompanyName(job.company.name);
+        setCompanyDescription(job.company.description);
+        setContactEmail(job.company.contactEmail);
+        setContactPhone(job.company.contactPhone);
       } catch (error) {
-        console.error('Error fetching job for edit', error);
-      } finally {
-        setLoading(false);
+        toast.error('Error al cargar empleo');
+        navigate('/jobs');
       }
     };
-
     fetchJob();
-  }, [id]);
+  }, [id, navigate]);
 
-  const submitForm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updatedJob = {
-      id,
       title,
       type,
-      description,
       salary,
       location,
+      description,
       company: {
         name: companyName,
         description: companyDescription,
@@ -61,167 +61,138 @@ const EditJobPage = ({ updateJobSubmit }) => {
     };
 
     try {
-      await updateJobSubmit(updatedJob);
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedJob),
+      });
+
+      if (!response.ok) throw new Error('Error al actualizar');
+
+      toast.success('Empleo actualizado correctamente');
       navigate(`/jobs/${id}`);
     } catch (error) {
-      console.error('Error al actualizar el empleo:', error);
-      alert('Hubo un error al actualizar el empleo.');
+      toast.error('No se pudo actualizar');
+      console.error(error);
     }
   };
 
-  if (loading) {
-    return <div className="text-center text-gray-600 py-20">Cargando datos del empleo...</div>;
-  }
-
   return (
-    <section className="bg-indigo-50 py-20">
-      <div className="container m-auto max-w-2xl py-2">
-        <div className="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
-          <form onSubmit={submitForm}>
-            <h2 className="text-3xl text-center font-semibold mb-6">Update Job</h2>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Job Type</label>
-              <select
-                id="type"
-                name="type"
-                className="border rounded w-full py-2 px-3"
-                required
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              >
-                <option value="Full-Time">Full-Time</option>
-                <option value="Part-Time">Part-Time</option>
-                <option value="Remote">Remote</option>
-                <option value="Internship">Internship</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Job Listing Name</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                className="border rounded w-full py-2 px-3 mb-2"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                className="border rounded w-full py-2 px-3"
-                rows="4"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              ></textarea>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Salary</label>
-              <select
-                id="salary"
-                name="salary"
-                className="border rounded w-full py-2 px-3"
-                required
-                value={salary}
-                onChange={(e) => setSalary(e.target.value)}
-              >
-                <option value="Under $50K">Under $50K</option>
-                <option value="$50K - $60K">$50K - $60K</option>
-                <option value="$60K - $70K">$60K - $70K</option>
-                <option value="$70K - $80K">$70K - $80K</option>
-                <option value="$80K - $90K">$80K - $90K</option>
-                <option value="$90K - $100K">$90K - $100K</option>
-                <option value="$100K - $125K">$100K - $125K</option>
-                <option value="$125K - $150K">$125K - $150K</option>
-                <option value="$150K - $175K">$150K - $175K</option>
-                <option value="$175K - $200K">$175K - $200K</option>
-                <option value="Over $200K">Over $200K</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Location</label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                className="border rounded w-full py-2 px-3 mb-2"
-                required
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-
-            <h3 className="text-2xl font-semibold mb-5">Company Info</h3>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Company Name</label>
-              <input
-                type="text"
-                id="company"
-                name="company"
-                className="border rounded w-full py-2 px-3"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Company Description</label>
-              <textarea
-                id="company_description"
-                name="company_description"
-                className="border rounded w-full py-2 px-3"
-                rows="4"
-                value={companyDescription}
-                onChange={(e) => setCompanyDescription(e.target.value)}
-              ></textarea>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Contact Email</label>
-              <input
-                type="email"
-                id="contact_email"
-                name="contact_email"
-                className="border rounded w-full py-2 px-3"
-                required
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 font-bold mb-2">Contact Phone</label>
-              <input
-                type="tel"
-                id="contact_phone"
-                name="contact_phone"
-                className="border rounded w-full py-2 px-3"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <button
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
-                type="submit"
-              >
-                Update Job
-              </button>
-            </div>
-          </form>
-        </div>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Editar Empleo</h1>
+        <Link to={`/jobs/${id}`} className="text-blue-600 hover:underline flex items-center gap-1 text-sm">
+          <FiArrowLeft size={18} /> Volver al detalle
+        </Link>
       </div>
-    </section>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">Título del empleo</label>
+          <input
+            type="text" id="title" name="title"
+            value={title} onChange={(e) => setTitle(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <select
+              id="type" name="type"
+              value={type} onChange={(e) => setType(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="full-time">Full Time</option>
+              <option value="part-time">Part Time</option>
+              <option value="remote">Remoto</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="salary" className="block text-sm font-medium text-gray-700 mb-1">Rango Salarial</label>
+            <select
+              id="salary" name="salary"
+              value={salary} onChange={(e) => setSalary(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="under-50k">Menos de 50k</option>
+              <option value="50k-100k">50k - 100k</option>
+              <option value="100k-150k">100k - 150k</option>
+              <option value="over-150k">Más de 150k</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Ubicación</label>
+          <input
+            type="text" id="location" name="location"
+            value={location} onChange={(e) => setLocation(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <textarea
+            id="description" name="description" rows={4}
+            value={description} onChange={(e) => setDescription(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          />
+        </div>
+
+        <fieldset className="border-t pt-6 space-y-4">
+          <legend className="text-lg font-semibold text-gray-700">Información de la Empresa</legend>
+          <div>
+            <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">Nombre de la empresa</label>
+            <input
+              type="text" id="companyName"
+              value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="companyDescription" className="block text-sm font-medium text-gray-700 mb-1">Descripción de la empresa</label>
+            <textarea
+              id="companyDescription" rows={3}
+              value={companyDescription} onChange={(e) => setCompanyDescription(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">Email de contacto</label>
+              <input
+                type="email" id="contactEmail"
+                value={contactEmail} onChange={(e) => setContactEmail(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-700 mb-1">Teléfono de contacto</label>
+              <input
+                type="tel" id="contactPhone"
+                value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
+                className="w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </fieldset>
+
+        <button
+          type="submit"
+          className="w-full bg-yellow-500 text-white py-3 rounded-md hover:bg-yellow-600 transition font-medium"
+        >
+          Actualizar Empleo
+        </button>
+      </form>
+    </div>
   );
 };
 

@@ -1,18 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react()],
   server: {
-    port: 5173, // Vite corre en el puerto 5173
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000', // json-server corre en el puerto 3000
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
+    port: 5173,
+    watch: {
+      // Ignorar cambios en la BD de JSON Server para evitar full-page reload
+      ignored: ['**/db.json', '**/jobs.json', '**/data/**'],
     },
   },
-})
+});

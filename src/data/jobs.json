@@ -1,0 +1,32 @@
+{
+  "jobs": [
+    {
+      "id": "1",
+      "title": "Senior React Developer",
+      "type": "full-time",
+      "salary": "100k-150k",
+      "location": "Madrid, España",
+      "description": "Buscamos un desarrollador senior con experiencia en React, Hooks, React Router y TypeScript.\n\nRequisitos:\n- 5+ años React\n- Testing (Jest/Vitest)\n- CI/CD",
+      "company": {
+        "name": "TechCorp",
+        "description": "Empresa líder en soluciones cloud.",
+        "contactEmail": "hr@techcorp.com",
+        "contactPhone": "+34 911 222 333"
+      }
+    },
+    {
+      "id": "2",
+      "title": "Frontend Junior (Prácticas)",
+      "type": "part-time",
+      "salary": "under-50k",
+      "location": "Remoto",
+      "description": "Prácticas remuneradas para aprender React en equipo real.",
+      "company": {
+        "name": "StartupXYZ",
+        "description": "Startup en fase seed.",
+        "contactEmail": "jobs@startupxyz.io",
+        "contactPhone": "+34 600 111 222"
+      }
+    }
+  ]
+}

@@ -1,118 +1,99 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { FaArrowLeft, FaMapMarker, FaDollarSign } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+// src/pages/JobPage.jsx
+import { useLoaderData, Link, useNavigate } from 'react-router-dom';
+import { 
+  FiArrowLeft, 
+  FiMapPin, 
+  FiClock, 
+  FiDollarSign, 
+  FiBuilding2, 
+  FiTrash2, 
+  FiEdit, 
+  FiAtSign, 
+  FiPhone 
+} from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import { API_BASE } from '../api/jobs';
 
-const JobPage = ({ deleteJob }) => {
-  const { id } = useParams();
+export async function jobLoader({ params }) {
+  const response = await fetch(`${API_BASE}/${params.id}`);
+  if (!response.ok) throw new Error('No se pudo cargar el empleo');
+  return response.json();
+}
+
+const JobPage = () => {
+  const job = useLoaderData();
   const navigate = useNavigate();
-  const [job, setJob] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await fetch(`/api/jobs/${id}`);
-        const data = await res.json();
-        setJob(data);
-      } catch (error) {
-        console.error('Error fetching data', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('¿Estás seguro que deseas borrar este empleo?');
+    if (!confirmDelete) return;
 
-    fetchJob();
-  }, [id]);
-
-  const onDeleteClick = (jobId) => {
-    const confirm = window.confirm('¿Estás seguro de que quieres eliminar este empleo?');
-    if (!confirm) return;
-
-    deleteJob(jobId);
-    navigate('/jobs');
+    try {
+      await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+      toast.success('Empleo eliminado correctamente');
+      navigate('/jobs');
+    } catch (error) {
+      toast.error('Error al eliminar');
+      console.error(error);
+    }
   };
 
-  if (loading) {
-    return <div className="text-center text-gray-600 py-20">Cargando...</div>;
-  }
-
   return (
-    <>
-      {/* Go Back Link */}
-      <section>
-        <div className="container m-auto py-6 px-6">
-          <Link
-            to="/jobs"
-            className="text-indigo-500 hover:text-indigo-600 flex items-center"
-          >
-            <FaArrowLeft className="mr-2" /> Back to Job Listings
-          </Link>
-        </div>
+    <div className="max-w-3xl mx-auto p-6 space-y-6 bg-white rounded-lg shadow-md">
+      <div className="flex items-center justify-between border-b pb-4">
+        <Link to="/jobs" className="flex items-center text-blue-600 hover:underline text-sm">
+          <FiArrowLeft className="mr-2" size={18} /> Volver a empleos
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-800">{job.title}</h1>
+      </div>
+
+      <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+        <span className="flex items-center gap-1 bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+          <FiClock size={14} /> {job.type.replace('-', ' ')}
+        </span>
+        <span className="flex items-center gap-1">
+          <FiDollarSign size={14} /> {job.salary.replace('-', ' ').toUpperCase()}
+        </span>
+        <span className="flex items-center gap-1">
+          <FiMapPin size={14} className="text-orange-600" /> {job.location}
+        </span>
+      </div>
+
+      <section className="space-y-2 border-t pt-6">
+        <h2 className="text-xl font-semibold text-gray-700">Descripción del empleo</h2>
+        <p className="whitespace-pre-wrap text-gray-600">{job.description}</p>
       </section>
 
-      <section className="bg-indigo-50 py-10">
-        <div className="container m-auto py-10 px-6">
-          <div className="grid grid-cols-1 md:grid-cols-7 w-full gap-6">
-            {/* Job Details */}
-            <main className="md:col-span-4">
-              <div className="bg-white p-6 rounded-lg shadow-md text-center md:text-left">
-                <div className="text-gray-500 mb-4">{job.type}</div>
-                <h1 className="text-3xl font-bold mb-4">{job.title}</h1>
-                <div className="text-orange-700 mb-4 flex align-middle justify-center md:justify-start">
-                  <FaMapMarker className="text-orange-700 mr-1 mt-1" />
-                  <p className="text-orange-700">{job.location}</p>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h3 className="text-indigo-800 text-lg font-bold mb-6">
-                  Job Description
-                </h3>
-                <p className="mb-4">{job.description}</p>
-
-                <h3 className="text-indigo-800 text-lg font-bold mb-2">Salary</h3>
-                <p className="mb-4">{job.salary} / Year</p>
-              </div>
-            </main>
-
-            {/* Sidebar */}
-            <aside className="md:col-span-3">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-xl font-bold mb-6">Company Info</h3>
-                <h2 className="text-2xl">{job.company?.name}</h2>
-                <p className="my-2">{job.company?.description}</p>
-                <hr className="my-4" />
-                <h3 className="text-xl">Contact Email:</h3>
-                <p className="my-2 bg-indigo-100 p-2 font-bold">
-                  {job.company?.contactEmail}
-                </p>
-                <h3 className="text-xl">Contact Phone:</h3>
-                <p className="my-2 bg-indigo-100 p-2 font-bold">
-                  {job.company?.contactPhone}
-                </p>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h3 className="text-xl font-bold mb-6">Manage Job</h3>
-                <Link
-                  to={`/edit-job/${job.id}`}
-                  className="bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline block mb-4"
-                >
-                  Edit Job
-                </Link>
-                <button
-                  onClick={() => onDeleteClick(job.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline block"
-                >
-                  Delete Job
-                </button>
-              </div>
-            </aside>
+      <section className="space-y-3 border-t pt-6">
+        <h2 className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+          <FiBuilding2 className="text-blue-600" /> {job.company.name}
+        </h2>
+        <p className="text-gray-600">{job.company.description}</p>
+        <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 bg-gray-50 p-4 rounded">
+          <div className="flex items-center gap-2">
+            <FiAtSign className="text-orange-500" size={16} /> <span>{job.company.contactEmail}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FiPhone className="text-orange-500" size={16} /> <span>{job.company.contactPhone}</span>
           </div>
         </div>
       </section>
-    </>
+
+      <div className="flex gap-4 border-t pt-6 justify-end">
+        <Link 
+          to={`/jobs/edit/${job.id}`} 
+          className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition flex items-center gap-2"
+        >
+          <FiEdit className="text-sm" /> Editar
+        </Link>
+        <button
+          onClick={() => handleDelete(job.id)}
+          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition flex items-center gap-2"
+        >
+          <FiTrash2 className="text-sm" /> Borrar
+        </button>
+      </div>
+    </div>
   );
 };
 
