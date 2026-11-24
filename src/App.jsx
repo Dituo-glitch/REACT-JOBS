@@ -8,7 +8,7 @@ import JobPage from './pages/JobPage';
 import AddJobPage from './pages/AddJobPage';
 import EditJobPage from './pages/EditJobPage';
 import NotFoundPage from './pages/NotFoundPage';
-import { jobsLoader, jobLoader } from './api/jobs';
+import { homeLoader, jobsLoader, jobLoader } from './api/jobs';
 
 const router = createBrowserRouter([
   {
@@ -17,15 +17,13 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        // Ruta sin path: los errores se muestran dentro del layout (con el menú)
         errorElement: <ErrorPage />,
         children: [
-          { index: true, element: <HomePage /> },
+          { index: true, element: <HomePage />, loader: homeLoader },
           { path: 'jobs', element: <JobsPage />, loader: jobsLoader },
-          // Las rutas estáticas van ANTES que las dinámicas (:id)
-          { path: 'jobs/add', element: <AddJobPage /> },
-          { path: 'jobs/edit/:id', element: <EditJobPage />, loader: jobLoader },
           { path: 'jobs/:id', element: <JobPage />, loader: jobLoader },
+          { path: 'add-job', element: <AddJobPage /> },
+          { path: 'edit-job/:id', element: <EditJobPage />, loader: jobLoader },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

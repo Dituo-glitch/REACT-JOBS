@@ -1,17 +1,19 @@
 import { Link } from 'react-router-dom';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 const NotFoundPage = () => {
   return (
-    <div className="max-w-xl mx-auto text-center py-16">
-      <h1 className="text-5xl font-bold text-gray-800 mb-3">404</h1>
-      <p className="text-gray-600 mb-6">Esta página no existe.</p>
+    <section className="text-center flex flex-col justify-center items-center h-96">
+      <FaExclamationTriangle className="text-yellow-400 text-6xl mb-4" />
+      <h1 className="text-6xl font-bold mb-4">404 Not Found</h1>
+      <p className="text-xl mb-5">This page does not exist</p>
       <Link
         to="/"
-        className="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        className="text-white bg-indigo-700 hover:bg-indigo-900 rounded-md px-3 py-2 mt-4"
       >
-        Ir al inicio
+        Go Back
       </Link>
-    </div>
+    </section>
   );
 };
 

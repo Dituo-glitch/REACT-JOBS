@@ -11,8 +11,8 @@ npm run dev      # web en http://localhost:5173
 Si tu API usa otra URL, copia `.env.example` a `.env` y cambia `VITE_API_URL`.
 
 ## Páginas
-- `/` Inicio (últimos 3 empleos)
-- `/jobs` Todos los empleos
-- `/jobs/add` Añadir empleo
+- `/` Home (3 empleos recientes)
+- `/jobs` Browse Jobs
 - `/jobs/:id` Detalle (editar / borrar)
-- `/jobs/edit/:id` Editar empleo
+- `/add-job` Añadir empleo
+- `/edit-job/:id` Editar empleo

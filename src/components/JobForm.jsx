@@ -1,15 +1,30 @@
 import { useState } from 'react';
 
-const inputClass =
-  'w-full border border-gray-300 rounded-md px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent';
-const labelClass = 'block text-sm font-medium text-gray-700 mb-1';
+const JOB_TYPES = ['Full-Time', 'Part-Time', 'Remote', 'Internship'];
+
+const SALARIES = [
+  'Under $50K',
+  '$50K - $60K',
+  '$60K - $70K',
+  '$70K - $80K',
+  '$80K - $90K',
+  '$90K - $100K',
+  '$100K - $125K',
+  '$125K - $150K',
+  '$150K - $175K',
+  '$175K - $200K',
+  'Over $200K',
+];
+
+const labelClass = 'block text-gray-700 font-bold mb-2';
+const fieldClass = 'border border-black rounded w-full py-2 px-3';
 
 const toFormState = (job) => ({
+  type: job?.type ?? 'Full-Time',
   title: job?.title ?? '',
-  type: job?.type ?? 'full-time',
-  salary: job?.salary ?? 'under-50k',
-  location: job?.location ?? '',
   description: job?.description ?? '',
+  salary: job?.salary ?? 'Under $50K',
+  location: job?.location ?? '',
   companyName: job?.company?.name ?? '',
   companyDescription: job?.company?.description ?? '',
   contactEmail: job?.company?.contactEmail ?? '',
@@ -19,9 +34,9 @@ const toFormState = (job) => ({
 const toJob = (f) => ({
   title: f.title.trim(),
   type: f.type,
-  salary: f.salary,
   location: f.location.trim(),
   description: f.description.trim(),
+  salary: f.salary,
   company: {
     name: f.companyName.trim(),
     description: f.companyDescription.trim(),
@@ -30,8 +45,8 @@ const toJob = (f) => ({
   },
 });
 
-// Formulario compartido por "Añadir" y "Editar"
-const JobForm = ({ initialJob, onSubmit, submitLabel, submitClass }) => {
+// Formulario compartido por "Add Job" y "Edit Job"
+const JobForm = ({ heading, initialJob, onSubmit, submitLabel }) => {
   const [form, setForm] = useState(() => toFormState(initialJob));
   const [saving, setSaving] = useState(false);
 
@@ -50,80 +65,101 @@ const JobForm = ({ initialJob, onSubmit, submitLabel, submitClass }) => {
     }
   };
 
+  const salaryOptions = SALARIES.includes(form.salary)
+    ? SALARIES
+    : [form.salary, ...SALARIES];
+  const typeOptions = JOB_TYPES.includes(form.type)
+    ? JOB_TYPES
+    : [form.type, ...JOB_TYPES];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label htmlFor="title" className={labelClass}>Título del empleo</label>
-        <input type="text" id="title" name="title" value={form.title} onChange={handleChange}
-          className={inputClass} placeholder="Ej: Desarrollador React Senior" required />
+    <section className="bg-indigo-50">
+      <div className="container m-auto max-w-2xl py-24">
+        <div className="bg-white px-6 py-8 mb-4 shadow-md rounded-md border border-black m-4 md:m-0">
+          <form onSubmit={handleSubmit}>
+            <h2 className="text-3xl text-center font-semibold mb-6">{heading}</h2>
+
+            <div className="mb-4">
+              <label htmlFor="type" className={labelClass}>Job Type</label>
+              <select id="type" name="type" className={fieldClass} required
+                value={form.type} onChange={handleChange}>
+                {typeOptions.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className={labelClass} htmlFor="title">Job Listing Name</label>
+              <input type="text" id="title" name="title" className={`${fieldClass} mb-2`}
+                placeholder="eg. Beautiful Apartment In Miami" required
+                value={form.title} onChange={handleChange} />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="description" className={labelClass}>Description</label>
+              <textarea id="description" name="description" className={fieldClass} rows="4"
+                placeholder="Add any job duties, expectations, requirements, etc" required
+                value={form.description} onChange={handleChange}></textarea>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="salary" className={labelClass}>Salary</label>
+              <select id="salary" name="salary" className={fieldClass} required
+                value={form.salary} onChange={handleChange}>
+                {salaryOptions.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className={labelClass}>Location</label>
+              <input type="text" id="location" name="location" className={`${fieldClass} mb-2`}
+                placeholder="Company Location" required
+                value={form.location} onChange={handleChange} />
+            </div>
+
+            <h3 className="text-2xl mb-5">Company Info</h3>
+
+            <div className="mb-4">
+              <label htmlFor="companyName" className={labelClass}>Company Name</label>
+              <input type="text" id="companyName" name="companyName" className={fieldClass}
+                placeholder="Company Name" required
+                value={form.companyName} onChange={handleChange} />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="companyDescription" className={labelClass}>Company Description</label>
+              <textarea id="companyDescription" name="companyDescription" className={fieldClass} rows="4"
+                placeholder="What does your company do?"
+                value={form.companyDescription} onChange={handleChange}></textarea>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="contactEmail" className={labelClass}>Contact Email</label>
+              <input type="email" id="contactEmail" name="contactEmail" className={fieldClass}
+                placeholder="Email address for applicants" required
+                value={form.contactEmail} onChange={handleChange} />
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="contactPhone" className={labelClass}>Contact Phone</label>
+              <input type="tel" id="contactPhone" name="contactPhone" className={fieldClass}
+                placeholder="Optional phone for applicants"
+                value={form.contactPhone} onChange={handleChange} />
+            </div>
+
+            <div>
+              <button type="submit" disabled={saving}
+                className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline disabled:opacity-60">
+                {saving ? 'Saving...' : submitLabel}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="type" className={labelClass}>Tipo de empleo</label>
-          <select id="type" name="type" value={form.type} onChange={handleChange} className={inputClass}>
-            <option value="full-time">Full Time</option>
-            <option value="part-time">Part Time</option>
-            <option value="remote">Remoto</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="salary" className={labelClass}>Rango salarial</label>
-          <select id="salary" name="salary" value={form.salary} onChange={handleChange} className={inputClass}>
-            <option value="under-50k">Menos de 50k</option>
-            <option value="50k-100k">50k - 100k</option>
-            <option value="100k-150k">100k - 150k</option>
-            <option value="over-150k">Más de 150k</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="location" className={labelClass}>Ubicación</label>
-        <input type="text" id="location" name="location" value={form.location} onChange={handleChange}
-          className={inputClass} placeholder="Ej: Bogotá, Colombia" required />
-      </div>
-
-      <div>
-        <label htmlFor="description" className={labelClass}>Descripción</label>
-        <textarea id="description" name="description" rows={4} value={form.description} onChange={handleChange}
-          className={inputClass} placeholder="Describe las responsabilidades..." required />
-      </div>
-
-      <fieldset className="border-t pt-6 space-y-4">
-        <legend className="text-lg font-semibold text-gray-700">Información de la empresa</legend>
-
-        <div>
-          <label htmlFor="companyName" className={labelClass}>Nombre de la empresa</label>
-          <input type="text" id="companyName" name="companyName" value={form.companyName} onChange={handleChange}
-            className={inputClass} required />
-        </div>
-
-        <div>
-          <label htmlFor="companyDescription" className={labelClass}>Descripción de la empresa</label>
-          <textarea id="companyDescription" name="companyDescription" rows={3} value={form.companyDescription}
-            onChange={handleChange} className={inputClass} />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="contactEmail" className={labelClass}>Email de contacto</label>
-            <input type="email" id="contactEmail" name="contactEmail" value={form.contactEmail}
-              onChange={handleChange} className={inputClass} required />
-          </div>
-          <div>
-            <label htmlFor="contactPhone" className={labelClass}>Teléfono de contacto</label>
-            <input type="tel" id="contactPhone" name="contactPhone" value={form.contactPhone}
-              onChange={handleChange} className={inputClass} />
-          </div>
-        </div>
-      </fieldset>
-
-      <button type="submit" disabled={saving}
-        className={`w-full text-white py-3 rounded-md transition font-medium disabled:opacity-60 ${submitClass}`}>
-        {saving ? 'Guardando...' : submitLabel}
-      </button>
-    </form>
+    </section>
   );
 };
 

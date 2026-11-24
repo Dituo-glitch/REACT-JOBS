@@ -15,12 +15,12 @@ async function request(url, options) {
     res = await fetch(url, options);
   } catch {
     throw new ApiError(
-      'No se pudo conectar con la API. ¿Está corriendo "npm run server"?',
+      'Could not reach the API. Is "npm run server" running?',
       0
     );
   }
   if (!res.ok) {
-    throw new ApiError(`Error de la API (${res.status})`, res.status);
+    throw new ApiError(`API error (${res.status})`, res.status);
   }
   return res.json();
 }
@@ -49,17 +49,16 @@ export const updateJob = (id, job) =>
 export const deleteJob = (id) =>
   request(`${API_BASE}/${encodeURIComponent(id)}`, { method: 'DELETE' });
 
-// Loaders de React Router
-export async function jobsLoader() {
-  return getJobs();
-}
+// React Router loaders
+export const homeLoader = () => getJobs(3);
+export const jobsLoader = () => getJobs();
 
 export async function jobLoader({ params }) {
   try {
     return await getJob(params.id);
   } catch (error) {
     if (error.status === 404) {
-      throw new Response('No encontrado', { status: 404 });
+      throw new Response('Not Found', { status: 404 });
     }
     throw error;
   }

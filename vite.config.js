@@ -7,7 +7,6 @@ export default defineConfig({
   server: {
     port: 5173,
     watch: {
-      // Ignorar cambios en la BD de JSON Server para evitar full-page reload
       ignored: ['**/db.json', '**/jobs.json', '**/data/**'],
     },
   },

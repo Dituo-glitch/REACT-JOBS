@@ -3,13 +3,13 @@ import { isRouteErrorResponse, useRouteError, Link } from 'react-router-dom';
 const ErrorPage = () => {
   const error = useRouteError();
 
-  let title = 'Algo salió mal';
-  let message = 'Ocurrió un error inesperado.';
+  let title = 'Something went wrong';
+  let message = 'An unexpected error occurred.';
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
-      title = 'No encontrado';
-      message = 'El empleo que buscas no existe o fue eliminado.';
+      title = 'Job not found';
+      message = 'The job you are looking for does not exist or was removed.';
     } else {
       message = error.statusText || message;
     }
@@ -18,16 +18,16 @@ const ErrorPage = () => {
   }
 
   return (
-    <div className="max-w-xl mx-auto text-center py-16">
-      <h1 className="text-3xl font-bold text-gray-800 mb-3">{title}</h1>
-      <p className="text-gray-600 mb-6">{message}</p>
+    <section className="text-center flex flex-col justify-center items-center h-96">
+      <h1 className="text-6xl font-bold mb-4">{title}</h1>
+      <p className="text-xl mb-5">{message}</p>
       <Link
         to="/jobs"
-        className="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        className="text-white bg-indigo-700 hover:bg-indigo-900 rounded-md px-3 py-2 mt-4"
       >
-        Volver a los empleos
+        Back to Jobs
       </Link>
-    </div>
+    </section>
   );
 };
 
